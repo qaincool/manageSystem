@@ -1,0 +1,6 @@
+port: 9090
+database:
+  db_name:
+  host:
+  username:
+  password:

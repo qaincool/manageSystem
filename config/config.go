@@ -1,9 +1,10 @@
 package config
 
 import (
+	"log"
+
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
-	"log"
 )
 
 const PAGE_SIZE int = 10

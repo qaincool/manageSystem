@@ -1,5 +1,6 @@
 package model
 
+// 配置文件
 type Config struct {
 	Port     string   `yaml:"port"`
 	Database Database `yaml:"database"`

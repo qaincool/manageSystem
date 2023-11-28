@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// 用户
+// User 用户
 type User struct {
 	UserID   string    `json:"userId" gorm:"column:user_id"`
 	Username string    `json:"username" gorm:"column:username"`

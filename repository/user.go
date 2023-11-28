@@ -97,8 +97,9 @@ func (repo *UserRepository) Edit(user model.User) (bool, error) {
 	return true, nil
 }
 
-func (repo *UserRepository) Delete(u model.User) (bool, error) {
-	err := repo.DB.Model(&u).Where("user_id=?", u.UserID).Delete(&u).Error
+func (repo *UserRepository) Delete(id string) (bool, error) {
+	var u = &model.User{}
+	err := repo.DB.Model(&u).Where("user_id=?", id).Delete(&u).Error
 	if err != nil {
 		return false, err
 	}

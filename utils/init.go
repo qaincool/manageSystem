@@ -2,8 +2,9 @@ package utils
 
 import (
 	"fmt"
-	"github.com/jinzhu/gorm"
 	"github.com/spf13/viper"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 	"log"
 	"manageSystem/config"
 	"manageSystem/model"
@@ -37,10 +38,9 @@ func InitDB() {
 		true,
 		"Local")
 
-	DB, err = gorm.Open("mysql", config)
+	DB, err = gorm.Open(mysql.Open(config), &gorm.Config{})
 	if err != nil {
 		log.Fatalf("connect error: %v\n", err)
 	}
-	DB.SingularTable(true)
 	fmt.Println("数据库 init 结束...")
 }

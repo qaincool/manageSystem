@@ -1,4 +1,4 @@
-package handler
+package resp
 
 type ResponseType int
 
@@ -21,6 +21,6 @@ func (p ResponseType) String() string {
 type RespEntity struct {
 	Code  ResponseType
 	Msg   string
-	Total int
+	Total int64
 	Data  interface{}
 }

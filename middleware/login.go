@@ -2,20 +2,20 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
-	"manageSystem/handler"
 	"manageSystem/model"
+	"manageSystem/resp"
 	"manageSystem/service"
 	"net/http"
 )
 
-var loginSrv service.LoginService
+var LoginSrv service.LoginService
 
 func AuthLogin() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var loginEntity = &model.Login{}
-		var entity = &handler.RespEntity{
-			Code:  handler.OperateFail,
-			Msg:   handler.OperateFail.String(),
+		var entity = &resp.RespEntity{
+			Code:  resp.OperateFail,
+			Msg:   resp.OperateFail.String(),
 			Total: 0,
 			Data:  nil,
 		}
@@ -29,12 +29,7 @@ func AuthLogin() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"entity": entity})
 			c.Abort()
 		}
-		isLogin, err := loginSrv.Auth(loginEntity)
-		if err != nil {
-			entity.Msg = err.Error()
-			c.JSON(http.StatusUnauthorized, gin.H{"entity": entity})
-			c.Abort()
-		}
+		isLogin, err := LoginSrv.Auth(loginEntity)
 
 		if isLogin {
 			c.Next()
@@ -43,6 +38,8 @@ func AuthLogin() gin.HandlerFunc {
 			c.JSON(http.StatusUnauthorized, gin.H{"entity": entity})
 			c.Abort()
 		}
+
+		c.MustGet(gin.AuthUserKey).(string)
 
 	}
 }

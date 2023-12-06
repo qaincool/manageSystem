@@ -6,7 +6,7 @@ import (
 	"manageSystem/query"
 	"manageSystem/utils"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type VideoRepository struct {
@@ -15,19 +15,15 @@ type VideoRepository struct {
 
 type VideoRepoInterface interface {
 	List(req *query.ListQuery) (Videos []*model.Video, err error)
-	GetTotal(req *query.ListQuery) (total int, err error)
-	Get(Banner model.Video) (*model.Video, error)
-	Exist(Banner model.Video) *model.Video
-	ExistByVideoId(ID string) *model.Video
-	ExistByVideoName(Name string) *model.Video
-	ExistByVideoPath(Path string) *model.Video
+	GetTotal() (total int64, err error)
+	Get(Video model.Video) (*model.Video, error)
+	Exist(Video *model.Video) *model.Video
 	Add(Banner model.Video) (*model.Video, error)
 	Edit(Banner model.Video) (bool, error)
 	Delete(id string) (bool, error)
 }
 
 func (repo *VideoRepository) List(req *query.ListQuery) (videos []*model.Video, err error) {
-	fmt.Println(req)
 	db := repo.DB
 	limit, offset := utils.Page(req.PageSize, req.Page) // 分页
 
@@ -37,10 +33,9 @@ func (repo *VideoRepository) List(req *query.ListQuery) (videos []*model.Video, 
 	return videos, nil
 }
 
-func (repo *VideoRepository) GetTotal(req *query.ListQuery) (total int, err error) {
+func (repo *VideoRepository) GetTotal() (total int64, err error) {
 	var videos []model.Video
 	db := repo.DB
-
 	if err := db.Find(&videos).Count(&total).Error; err != nil {
 		return total, err
 	}
@@ -54,34 +49,17 @@ func (repo *VideoRepository) Get(video model.Video) (*model.Video, error) {
 	return &video, nil
 }
 
-func (repo *VideoRepository) Exist(video model.Video) *model.Video {
-	repo.DB.Find(&video).Where("video_name = ?", video.VideoName)
-	if &video != nil {
-		return &video
+func (repo *VideoRepository) Exist(video *model.Video) *model.Video {
+	var total int64
+	repo.DB.Where(&video).Find(&video).Count(&total)
+	if total > 0 {
+		return video
 	}
 	return nil
 }
 
-func (repo *VideoRepository) ExistByVideoId(id string) *model.Video {
-	var video model.Video
-	repo.DB.Where("video_id = ?", id).First(&video)
-	return &video
-}
-
-func (repo *VideoRepository) ExistByVideoName(name string) *model.Video {
-	var video model.Video
-	repo.DB.Where("video_name = ?", name).First(&video)
-	return &video
-}
-
-func (repo *VideoRepository) ExistByVideoPath(path string) *model.Video {
-	var video model.Video
-	repo.DB.Where("video_path = ?", path).First(&video)
-	return &video
-}
-
 func (repo *VideoRepository) Add(video model.Video) (*model.Video, error) {
-	if exist := repo.Exist(video); exist != nil {
+	if exist := repo.Exist(&video); exist != nil {
 		return nil, fmt.Errorf("视频已存在")
 	}
 	err := repo.DB.Create(&video).Error

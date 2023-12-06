@@ -14,7 +14,7 @@ import (
 
 type UserSrv interface {
 	List(req *query.ListQuery) (users []*model.User, err error)
-	GetTotal(req *query.ListQuery) (total int, err error)
+	GetTotal(req *query.ListQuery) (total int64, err error)
 	Get(user model.User) (*model.User, error)
 	Exist(user model.User) *model.User
 	ExistByUserID(id string) *model.User
@@ -34,7 +34,7 @@ func (srv *UserService) List(req *query.ListQuery) (users []*model.User, err err
 	return srv.Repo.List(req)
 }
 
-func (srv *UserService) GetTotal(req *query.ListQuery) (total int, err error) {
+func (srv *UserService) GetTotal(req *query.ListQuery) (total int64, err error) {
 	return srv.Repo.GetTotal(req)
 }
 

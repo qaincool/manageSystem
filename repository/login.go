@@ -2,7 +2,7 @@ package repository
 
 import (
 	"errors"
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 	"manageSystem/model"
 	"manageSystem/utils"
 )

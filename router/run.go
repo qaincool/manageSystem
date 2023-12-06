@@ -8,7 +8,7 @@ import (
 
 func Run() {
 	router := gin.New()
-	router.Use(gin.Recovery(), middleware.AuthLogin())
+	router.Use(gin.Recovery(), middleware.AuthLogin(), gin.BasicAuth())
 
 	apiRouter := router.Group("/api/v1")
 
@@ -26,5 +26,5 @@ func Run() {
 		videoRouter.GET("/getVideos")
 	}
 
-	router.Run(viper.GetString("port"))
+	router.Run(":" + viper.GetString("port"))
 }

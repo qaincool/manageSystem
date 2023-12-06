@@ -3,6 +3,7 @@ package handler
 import (
 	"manageSystem/model"
 	"manageSystem/query"
+	"manageSystem/resp"
 	"manageSystem/service"
 	"net/http"
 
@@ -30,9 +31,9 @@ type UserHandler struct {
 // GET /api/v1/user/getUser
 // param: id
 func (h *UserHandler) UserInfoHandler(c *gin.Context) {
-	entity := RespEntity{
-		Code:  OperateFail,
-		Msg:   OperateFail.String(),
+	entity := resp.RespEntity{
+		Code:  resp.OperateFail,
+		Msg:   resp.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -44,18 +45,18 @@ func (h *UserHandler) UserInfoHandler(c *gin.Context) {
 	u := model.User{
 		UserID: userId,
 	}
-	result, err := h.UserSrv.Get(u)
+	userInfo, err := h.UserSrv.Get(u)
 
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 
-	entity = RespEntity{
+	entity = resp.RespEntity{
 		Code:  http.StatusOK,
-		Msg:   OperateOk.String(),
+		Msg:   resp.OperateOk.String(),
 		Total: 0,
-		Data:  *result,
+		Data:  resp.UserModelMapEntity(userInfo),
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }
@@ -65,9 +66,9 @@ func (h *UserHandler) UserInfoHandler(c *gin.Context) {
 // param: page=1 pageSize=10 可不传
 func (h *UserHandler) UserListHandler(c *gin.Context) {
 	var q query.ListQuery
-	entity := RespEntity{
-		Code:  OperateFail,
-		Msg:   OperateFail.String(),
+	entity := resp.RespEntity{
+		Code:  resp.OperateFail,
+		Msg:   resp.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -76,18 +77,22 @@ func (h *UserHandler) UserListHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	userList, err := h.UserSrv.List(&q)
-	total, err := h.UserSrv.GetTotal(&q)
+	userInfoList, err := h.UserSrv.List(&q)
 
 	if err != nil {
 		panic(err)
 	}
 
-	entity = RespEntity{
+	var userEntityList []*resp.UserResp
+	for _, userInfo := range userInfoList {
+		userEntityList = append(userEntityList, resp.UserModelMapEntity(userInfo))
+	}
+
+	entity = resp.RespEntity{
 		Code:  http.StatusOK,
 		Msg:   "OK",
-		Total: total,
-		Data:  userList,
+		Total: int64(len(userEntityList)),
+		Data:  userEntityList,
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }
@@ -96,9 +101,9 @@ func (h *UserHandler) UserListHandler(c *gin.Context) {
 // POST /api/v1/user/addUser
 // data: 必填字段: mobile,role 非必填: username password address
 func (h *UserHandler) AddUserHandler(c *gin.Context) {
-	entity := RespEntity{
-		Code:  OperateFail,
-		Msg:   OperateFail.String(),
+	entity := resp.RespEntity{
+		Code:  resp.OperateFail,
+		Msg:   resp.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -118,8 +123,8 @@ func (h *UserHandler) AddUserHandler(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 		return
 	}
-	entity.Code = OperateOk
-	entity.Msg = OperateOk.String()
+	entity.Code = resp.OperateOk
+	entity.Msg = resp.OperateOk.String()
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 
 }
@@ -129,9 +134,9 @@ func (h *UserHandler) AddUserHandler(c *gin.Context) {
 // data: 必填字段user_id 非必填: 需要修改的字段
 func (h *UserHandler) EditUserHandler(c *gin.Context) {
 	u := model.User{}
-	entity := RespEntity{
-		Code:  OperateFail,
-		Msg:   OperateFail.String(),
+	entity := resp.RespEntity{
+		Code:  resp.OperateFail,
+		Msg:   resp.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -146,8 +151,8 @@ func (h *UserHandler) EditUserHandler(c *gin.Context) {
 		return
 	}
 	if b {
-		entity.Code = OperateOk
-		entity.Msg = OperateOk.String()
+		entity.Code = resp.OperateOk
+		entity.Msg = resp.OperateOk.String()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
 
@@ -158,9 +163,9 @@ func (h *UserHandler) EditUserHandler(c *gin.Context) {
 // data: 必填字段user_id 其他可以不用填写
 func (h *UserHandler) DeleteUserHandler(c *gin.Context) {
 	u := model.User{}
-	entity := RespEntity{
-		Code:  OperateFail,
-		Msg:   OperateFail.String(),
+	entity := resp.RespEntity{
+		Code:  resp.OperateFail,
+		Msg:   resp.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -178,8 +183,8 @@ func (h *UserHandler) DeleteUserHandler(c *gin.Context) {
 		return
 	}
 	if b {
-		entity.Code = OperateOk
-		entity.Msg = OperateOk.String()
+		entity.Code = resp.OperateOk
+		entity.Msg = resp.OperateOk.String()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 	}
 }

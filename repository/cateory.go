@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"manageSystem/model"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type CategoryRepository struct {

@@ -3,7 +3,7 @@ package repository
 import (
 	"manageSystem/model"
 
-	"github.com/jinzhu/gorm"
+	"gorm.io/gorm"
 )
 
 type PermissionRepository struct {
@@ -11,7 +11,7 @@ type PermissionRepository struct {
 }
 
 type PermissionRepoInterface interface {
-	GetPermissionByRoleId(roleId string) ([]*model.Permission, error)
+	GetPermissionTree(roleId string) (map[string][]string, error)
 }
 
 func (repo *PermissionRepository) GetPermissionByRoleId(roleId string) ([]*model.Permission, error) {
@@ -31,4 +31,28 @@ func (repo *PermissionRepository) GetPermissionByRoleId(roleId string) ([]*model
 		permissions = append(permissions, permission)
 	}
 	return permissions, nil
+}
+func (repo *PermissionRepository) GetPermissionTree(roleId string) (map[string][]string, error) {
+	permissions, err := repo.GetPermissionByRoleId(roleId)
+	if err != nil {
+		return nil, err
+	}
+	var permissionTreeMap = make(map[string][]string)
+	db := repo.DB
+
+	for _, permission := range permissions {
+		var childrenNameList []string
+		var childrenList []*model.Permission
+
+		if err := db.Find(&childrenList, "parent_id = ?", permission.PermissionId).Error; err != nil {
+			return nil, err
+		}
+		for _, c := range childrenList {
+			if c.PermissionName != "" {
+				childrenNameList = append(childrenNameList, c.PermissionName)
+			}
+		}
+		permissionTreeMap[permission.PermissionName] = childrenNameList
+	}
+	return permissionTreeMap, nil
 }

@@ -15,7 +15,7 @@ type Video struct {
 	// 标签信息
 	VideoTag string `json:"video_tag" column:"video_tag"`
 	// 所属品类id号
-	CategoryId string `json:"category_id" gorm:"column:category_id""`
+	CategoryId string `json:"category_id" gorm:"column:category_id"`
 	// 上传用户
 	CreateUser string `json:"create_user" gorm:"column:create_user"`
 	// 上传时间

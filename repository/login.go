@@ -1,10 +1,8 @@
 package repository
 
 import (
-	"errors"
 	"gorm.io/gorm"
 	"manageSystem/model"
-	"manageSystem/utils"
 )
 
 type LoginRepository struct {
@@ -12,18 +10,18 @@ type LoginRepository struct {
 }
 
 type LoginRepoInterface interface {
-	Auth(login *model.Login) (bool, error)
+	Auth() (map[string]string, error)
 }
 
-func (repo *LoginRepository) Auth(login *model.Login) (bool, error) {
-	var user = &model.User{}
-	repo.DB.Find(&user).Where("mobile = ?", login.Mobile)
-	if user.Password == "" {
-		return false, errors.New("用户不存在")
+func (repo *LoginRepository) Auth() (map[string]string, error) {
+	var userPassMap = make(map[string]string)
+	var users []model.User
+	if err := repo.DB.Find(&users).Error; err != nil {
+		return nil, err
 	}
-	if user.Password != utils.Md5(login.Password) {
-		return false, errors.New("用户名或密码错误")
+	// 将数据库中存储的账号名/密码存入内存
+	for _, user := range users {
+		userPassMap[user.Mobile] = user.Password
 	}
-	return true, nil
-
+	return userPassMap, nil
 }

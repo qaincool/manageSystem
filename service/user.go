@@ -18,7 +18,7 @@ type UserSrv interface {
 	Get(user model.User) (*model.User, error)
 	Exist(user model.User) *model.User
 	ExistByUserID(id string) *model.User
-	Add(user model.User) (*model.User, error)
+	Add(user *model.User) (*model.User, error)
 	Edit(user model.User) (bool, error)
 	Delete(id string) (bool, error)
 }
@@ -50,7 +50,7 @@ func (srv *UserService) ExistByUserID(id string) *model.User {
 	return srv.Repo.ExistByUserID(id)
 }
 
-func (srv *UserService) Add(user model.User) (*model.User, error) {
+func (srv *UserService) Add(user *model.User) (*model.User, error) {
 	//根据手机号判断是否存在用户
 	result := srv.Repo.ExistByMobile(user.Mobile)
 	if result != nil {
@@ -59,22 +59,25 @@ func (srv *UserService) Add(user model.User) (*model.User, error) {
 	user.UserID = uuid.NewV4().String()
 	if user.Password == "" {
 		user.Password = utils.Md5("123456")
+	} else {
+		user.Password = utils.Md5(user.Password)
 	}
-	return srv.Repo.Add(user)
+	return srv.Repo.Add(*user)
 }
 
 func (srv *UserService) Edit(user model.User) (bool, error) {
 	if user.UserID == "" {
-		return false, fmt.Errorf("参数错误")
+		return false, fmt.Errorf("请输入用户id")
 	}
-
 	exist := srv.Repo.ExistByUserID(user.UserID)
 	if exist == nil {
-		return false, errors.New("参数错误")
+		return false, errors.New("用户不存在")
 	}
+
 	exist.Username = user.Username
 	exist.Mobile = user.Mobile
 	exist.Address = user.Address
+	exist.RoleId = user.RoleId
 	return srv.Repo.Edit(*exist)
 }
 

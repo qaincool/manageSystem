@@ -3,8 +3,8 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"manageSystem/model"
+	"manageSystem/model/response"
 	"manageSystem/query"
-	"manageSystem/resp"
 	"manageSystem/service"
 	"net/http"
 	"time"
@@ -16,9 +16,9 @@ type VideoHandler struct {
 
 func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 	var q query.ListQuery
-	entity := resp.RespEntity{
-		Code:  resp.OperateFail,
-		Msg:   resp.OperateFail.String(),
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -34,7 +34,7 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 		panic(err)
 	}
 
-	entity = resp.RespEntity{
+	entity = response.RespEntity{
 		Code:  http.StatusOK,
 		Msg:   "OK",
 		Total: total,
@@ -48,9 +48,9 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 // data: video_name和video_path
 func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 	var videoInfoReqBody model.Video
-	entity := resp.RespEntity{
-		Code:  resp.OperateFail,
-		Msg:   resp.OperateFail.String(),
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -66,7 +66,7 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 		return
 	}
 
-	entity = resp.RespEntity{
+	entity = response.RespEntity{
 		Code:  http.StatusOK,
 		Msg:   "OK",
 		Total: 1,
@@ -80,9 +80,9 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 // data: 必填字段 video_name和video_path，可选字段 video_intro,video_detail,video_tag,category_id,create_user
 func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 	var videoInfoReqBody model.Video
-	entity := resp.RespEntity{
-		Code:  resp.OperateFail,
-		Msg:   resp.OperateFail.String(),
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
@@ -100,7 +100,7 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 		return
 	}
 
-	entity = resp.RespEntity{
+	entity = response.RespEntity{
 		Code:  http.StatusOK,
 		Msg:   "OK",
 		Total: 1,

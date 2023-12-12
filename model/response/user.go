@@ -1,10 +1,10 @@
-package resp
+package response
 
 import "manageSystem/model"
 
 // UserResp 响应体
 type UserResp struct {
-	UserId   string `json:"userId" gorm:"column:user_id"`
+	UserId   string `json:"id" gorm:"column:user_id"`
 	Username string `json:"username" gorm:"column:username"`
 	Mobile   string `json:"mobile" gorm:"column:mobile"`
 	Address  string `json:"address" gorm:"column:address"`
@@ -19,6 +19,5 @@ func UserModelMapEntity(user *model.User) *UserResp {
 		Address:  user.Address,
 		RoleId:   user.RoleId,
 	}
-
 	return userEntity
 }

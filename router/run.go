@@ -8,14 +8,14 @@ import (
 
 func Run() {
 	router := gin.New()
-	router.Use(gin.Recovery(), middleware.AuthLogin(), gin.BasicAuth())
+	router.Use(gin.Logger(), gin.Recovery(), middleware.AuthLogin(), middleware.AuthLogin())
 
 	apiRouter := router.Group("/api/v1")
 
 	userRouter := apiRouter.Group("/user")
 	{
-		userRouter.GET("/getUser", UserHandler.UserInfoHandler)
 		userRouter.GET("/getUserList", UserHandler.UserListHandler)
+		userRouter.POST("/getUser", UserHandler.UserInfoHandler)
 		userRouter.POST("/addUser", UserHandler.AddUserHandler)
 		userRouter.POST("/editUser", UserHandler.EditUserHandler)
 		userRouter.POST("/deleteUser", UserHandler.DeleteUserHandler)

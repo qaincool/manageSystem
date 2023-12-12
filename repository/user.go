@@ -16,12 +16,12 @@ type UserRepository struct {
 type UserRepoInterface interface {
 	List(req *query.ListQuery) (Users []*model.User, err error)
 	GetTotal(req *query.ListQuery) (total int64, err error)
-	Get(Banner model.User) (*model.User, error)
-	Exist(Banner model.User) *model.User
+	Get(User model.User) (*model.User, error)
+	Exist(User model.User) *model.User
 	ExistByUserID(id string) *model.User
 	ExistByMobile(mobile string) *model.User
-	Add(Banner model.User) (*model.User, error)
-	Edit(Banner model.User) (bool, error)
+	Add(User model.User) (*model.User, error)
+	Edit(User model.User) (bool, error)
 	Delete(id string) (bool, error)
 }
 
@@ -53,18 +53,19 @@ func (repo *UserRepository) Get(user model.User) (*model.User, error) {
 }
 
 func (repo *UserRepository) Exist(user model.User) *model.User {
-	repo.DB.Find(&user).Where("username = ?", user.Username)
-	if &user != nil {
+	var total int64
+	repo.DB.Where(&user).Find(&user).Count(&total)
+	if total > 0 {
 		return &user
 	}
 	return nil
 }
 
 func (repo *UserRepository) ExistByMobile(mobile string) *model.User {
-	var count int
 	var user model.User
-	repo.DB.Find(&user).Where("mobile = ?", mobile)
-	if count > 0 {
+	var total int64
+	repo.DB.Find(&user).Where("mobile = ?", mobile).Count(&total)
+	if total > 0 {
 		return &user
 	}
 	return nil
@@ -72,13 +73,17 @@ func (repo *UserRepository) ExistByMobile(mobile string) *model.User {
 
 func (repo *UserRepository) ExistByUserID(id string) *model.User {
 	var user model.User
-	repo.DB.Where("user_id = ?", id).First(&user)
-	return &user
+	var total int64
+	repo.DB.Where("user_id = ?", id).First(&user).Count(&total)
+	if total > 0 {
+		return &user
+	}
+	return nil
 }
 
 func (repo *UserRepository) Add(user model.User) (*model.User, error) {
 	if exist := repo.Exist(user); exist != nil {
-		return nil, fmt.Errorf("用户注册已存在")
+		return nil, fmt.Errorf("用户已存在")
 	}
 	err := repo.DB.Create(&user).Error
 	if err != nil {
@@ -88,7 +93,13 @@ func (repo *UserRepository) Add(user model.User) (*model.User, error) {
 }
 
 func (repo *UserRepository) Edit(user model.User) (bool, error) {
-	err := repo.DB.Model(&user).Where("user_id=?", user.UserID).Updates(map[string]interface{}{"username": user.Username, "mobile": user.Mobile, "address": user.Address}).Error
+	err := repo.DB.Model(&user).Where("user_id = ?", user.UserID).Updates(map[string]interface{}{
+		"username": user.Username,
+		"mobile":   user.Mobile,
+		"address":  user.Address,
+		"password": user.Password,
+		"role":     user.RoleId,
+	}).Error
 	//err := repo.DB.Save(&user).Error
 	if err != nil {
 		return false, err

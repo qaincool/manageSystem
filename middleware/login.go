@@ -1,19 +1,28 @@
 package middleware
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
-	"log"
+	"manageSystem/model/response"
 	"manageSystem/service"
+	"net/http"
 )
 
-var LoginSrv service.LoginService
+var TokenSrv service.TokenService
 
-func AuthLogin() gin.HandlerFunc {
-	userPassMap, err := LoginSrv.Auth()
-	if err != nil {
-		log.Printf("读取数据库中用户账号密码信息失败：%s\n", err)
+func AuthToken() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		entity := response.RespEntity{
+			Code:  response.OperateFail,
+			Msg:   response.OperateFail.String(),
+			Total: 0,
+			Data:  nil,
+		}
+		token := c.GetHeader("token")
+		if err := TokenSrv.AuthToken(token); err != nil {
+			entity.Msg = "token验证失败：" + err.Error()
+			c.JSON(http.StatusUnauthorized, gin.H{"entity": entity})
+			c.Abort()
+		}
+		c.Next()
 	}
-	fmt.Println("success")
-	return gin.BasicAuth(userPassMap)
 }

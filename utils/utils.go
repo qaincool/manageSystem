@@ -2,8 +2,10 @@ package utils
 
 import (
 	"crypto/md5"
+	"encoding/base64"
 	"fmt"
 	"io"
+	"math/rand"
 	"time"
 )
 
@@ -59,4 +61,22 @@ func Md5(str string) string {
 	io.WriteString(w, str)
 	md5str := fmt.Sprintf("%x", w.Sum(nil))
 	return md5str
+}
+
+// CreateToken 创建token
+func CreateToken(userId string, expiresAt time.Time) string {
+	// 生成随机字符串
+	tokenBytes := make([]byte, 32)
+	rand.Read(tokenBytes)
+
+	// 将随机字符串编码为 base64
+	token := base64.StdEncoding.EncodeToString(tokenBytes)
+
+	// 设置过期时间
+	expiresAtInSecs := expiresAt.Unix()
+
+	// 生成 token 字符串
+	tokenStr := fmt.Sprintf("%s:%d", token, expiresAtInSecs)
+
+	return tokenStr
 }

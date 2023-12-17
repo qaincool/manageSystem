@@ -11,16 +11,35 @@ type PermissionRepository struct {
 }
 
 type PermissionRepoInterface interface {
-	GetPermissionTree(roleId string) (map[string][]string, error)
+	GetRoleNameByToken(token string) (*model.User, error)
+	GetPermissionByRoleName(roleName string) ([]*model.Permission, error)
 }
 
-func (repo *PermissionRepository) GetPermissionByRoleId(roleId string) ([]*model.Permission, error) {
+func (repo *PermissionRepository) GetRoleNameByToken(userToken string) (*model.User, error) {
+	var user *model.User
+	db := repo.DB
+	var token = &model.Token{
+		Token: userToken,
+	}
+	db.First(token)
+	if err := db.Find(&user, "user_id = ?", token.UserID).Error; err != nil {
+		return nil, err
+	}
+	return user, nil
+}
+
+func (repo *PermissionRepository) GetPermissionByRoleName(roleName string) ([]*model.Permission, error) {
 	var permissions []*model.Permission
 	db := repo.DB
 
 	var rolePermissions []*model.RolePermission
 
-	if err := db.Find(&rolePermissions, "role_id = ?", roleId).Error; err != nil {
+	var role model.Role
+	if err := db.Find(&role, "role_name = ?", roleName).Error; err != nil {
+		return nil, err
+	}
+
+	if err := db.Find(&rolePermissions, "role_id = ?", role.RoleId).Error; err != nil {
 		return nil, err
 	}
 	for _, rolePermission := range rolePermissions {
@@ -31,28 +50,4 @@ func (repo *PermissionRepository) GetPermissionByRoleId(roleId string) ([]*model
 		permissions = append(permissions, permission)
 	}
 	return permissions, nil
-}
-func (repo *PermissionRepository) GetPermissionTree(roleId string) (map[string][]string, error) {
-	permissions, err := repo.GetPermissionByRoleId(roleId)
-	if err != nil {
-		return nil, err
-	}
-	var permissionTreeMap = make(map[string][]string)
-	db := repo.DB
-
-	for _, permission := range permissions {
-		var childrenNameList []string
-		var childrenList []*model.Permission
-
-		if err := db.Find(&childrenList, "parent_id = ?", permission.PermissionId).Error; err != nil {
-			return nil, err
-		}
-		for _, c := range childrenList {
-			if c.PermissionName != "" {
-				childrenNameList = append(childrenNameList, c.PermissionName)
-			}
-		}
-		permissionTreeMap[permission.PermissionName] = childrenNameList
-	}
-	return permissionTreeMap, nil
 }

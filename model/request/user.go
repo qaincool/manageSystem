@@ -9,7 +9,7 @@ type UserReq struct {
 	Mobile   string `json:"mobile"`
 	Password string `json:"password"`
 	Address  string `json:"address"`
-	RoleId   uint   `json:"role"`
+	RoleName string `json:"role_name"`
 }
 
 func UserModelMapEntity(user *UserReq) *model.User {
@@ -19,7 +19,7 @@ func UserModelMapEntity(user *UserReq) *model.User {
 		Mobile:   user.Mobile,
 		Password: user.Password,
 		Address:  user.Address,
-		RoleId:   user.RoleId,
+		RoleName: user.RoleName,
 	}
 	return userEntity
 }

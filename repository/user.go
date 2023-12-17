@@ -94,11 +94,11 @@ func (repo *UserRepository) Add(user model.User) (*model.User, error) {
 
 func (repo *UserRepository) Edit(user model.User) (bool, error) {
 	err := repo.DB.Model(&user).Where("user_id = ?", user.UserID).Updates(map[string]interface{}{
-		"username": user.Username,
-		"mobile":   user.Mobile,
-		"address":  user.Address,
-		"password": user.Password,
-		"role":     user.RoleId,
+		"username":  user.Username,
+		"mobile":    user.Mobile,
+		"address":   user.Address,
+		"password":  user.Password,
+		"role_name": user.RoleName,
 	}).Error
 	//err := repo.DB.Save(&user).Error
 	if err != nil {

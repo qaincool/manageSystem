@@ -77,7 +77,7 @@ func (srv *UserService) Edit(user model.User) (bool, error) {
 	exist.Username = user.Username
 	exist.Mobile = user.Mobile
 	exist.Address = user.Address
-	exist.RoleId = user.RoleId
+	exist.RoleName = user.RoleName
 	return srv.Repo.Edit(*exist)
 }
 

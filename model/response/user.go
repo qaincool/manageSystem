@@ -4,11 +4,11 @@ import "manageSystem/model"
 
 // UserResp 响应体
 type UserResp struct {
-	UserId   string `json:"id" gorm:"column:user_id"`
-	Username string `json:"username" gorm:"column:username"`
-	Mobile   string `json:"mobile" gorm:"column:mobile"`
-	Address  string `json:"address" gorm:"column:address"`
-	RoleId   uint   `json:"role" gorm:"column:role"`
+	UserId   string `json:"id"`
+	Username string `json:"username"`
+	Mobile   string `json:"mobile"`
+	Address  string `json:"address"`
+	RoleName string `json:"role_name"`
 }
 
 func UserModelMapEntity(user *model.User) *UserResp {
@@ -17,7 +17,7 @@ func UserModelMapEntity(user *model.User) *UserResp {
 		Username: user.Username,
 		Mobile:   user.Mobile,
 		Address:  user.Address,
-		RoleId:   user.RoleId,
+		RoleName: user.RoleName,
 	}
 	return userEntity
 }

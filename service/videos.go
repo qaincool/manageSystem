@@ -14,7 +14,7 @@ import (
 type VideoRepoSrv interface {
 	List(req *query.ListQuery) (Videos []*model.Video, err error)
 	GetTotal() (total int64, err error)
-	Get(Video model.Video) (*model.Video, error)
+	Get(Video *model.Video) (*model.Video, error)
 	Exist(Video *model.Video) *model.Video
 	Add(Video model.Video) (*model.Video, error)
 	Edit(Video model.Video) (bool, error)
@@ -36,7 +36,7 @@ func (srv *VideoService) GetTotal() (total int64, err error) {
 	return srv.Repo.GetTotal()
 }
 
-func (srv *VideoService) Get(video model.Video) (*model.Video, error) {
+func (srv *VideoService) Get(video *model.Video) (*model.Video, error) {
 	return srv.Repo.Get(video)
 }
 

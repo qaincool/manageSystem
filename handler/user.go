@@ -27,13 +27,14 @@ func (h *UserHandler) UserInfoHandler(c *gin.Context) {
 	u := request.UserReq{}
 	err := c.ShouldBindJSON(&u)
 	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 
 	userInfo, err := h.UserSrv.Get(*request.UserModelMapEntity(&u))
-
 	if err != nil {
+		entity.Msg = "获取用户错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -60,13 +61,15 @@ func (h *UserHandler) UserListHandler(c *gin.Context) {
 	}
 	err := c.ShouldBindQuery(&q)
 	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 	userInfoList, err := h.UserSrv.List(&q)
-
 	if err != nil {
-		panic(err)
+		entity.Msg = "获取用户列表错误：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
 	}
 
 	var userEntityList []*response.UserResp
@@ -96,14 +99,14 @@ func (h *UserHandler) AddUserHandler(c *gin.Context) {
 	u := request.UserReq{}
 	err := c.ShouldBindJSON(&u)
 	if err != nil {
-		entity.Msg = "请求体格式错误"
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 
 	r, err := h.UserSrv.Add(request.UserModelMapEntity(&u))
 	if err != nil {
-		entity.Msg = err.Error()
+		entity.Msg = "用户插入失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -132,13 +135,13 @@ func (h *UserHandler) EditUserHandler(c *gin.Context) {
 	u := request.UserReq{}
 	err := c.ShouldBindJSON(&u)
 	if err != nil {
-		entity.Msg = "请求体格式错误"
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 		return
 	}
 	b, err := h.UserSrv.Edit(*request.UserModelMapEntity(&u))
 	if err != nil {
-		entity.Msg = err.Error()
+		entity.Msg = "用户修改失败：" + err.Error()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 		return
 	}
@@ -163,6 +166,7 @@ func (h *UserHandler) DeleteUserHandler(c *gin.Context) {
 	u := request.UserReq{}
 	err := c.ShouldBindJSON(&u)
 	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 		return
 	}
@@ -170,6 +174,7 @@ func (h *UserHandler) DeleteUserHandler(c *gin.Context) {
 	b, err := h.UserSrv.Delete(u.UserId)
 
 	if err != nil {
+		entity.Msg = "用户删除失败：" + err.Error()
 		c.JSON(http.StatusOK, gin.H{"entity": entity})
 		return
 	}

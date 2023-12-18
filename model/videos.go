@@ -4,7 +4,7 @@ import "time"
 
 // 视频
 type Video struct {
-	VideoId   string `json:"video_id" gorm:"column:video_id"`
+	VideoId   string `json:"video_id" gorm:"column:video_id;primary_key;not null"`
 	VideoName string `json:"video_name" gorm:"column:video_name"`
 	// 简介
 	VideoIntro string `json:"video_intro" gorm:"column:video_intro"`
@@ -13,7 +13,7 @@ type Video struct {
 	// 详细描述
 	VideoDetail string `json:"video_detail" gorm:"column:video_detail"`
 	// 标签信息
-	VideoTag string `json:"video_tag" column:"video_tag"`
+	VideoTag []string `json:"video_tag" column:"video_tag"`
 	// 所属品类id号
 	CategoryId string `json:"category_id" gorm:"column:category_id"`
 	// 上传用户

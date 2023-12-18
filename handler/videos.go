@@ -3,6 +3,7 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"manageSystem/model"
+	"manageSystem/model/request"
 	"manageSystem/model/response"
 	"manageSystem/query"
 	"manageSystem/service"
@@ -24,6 +25,7 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 	}
 	err := c.ShouldBindQuery(&q)
 	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -31,7 +33,9 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 	total, err := h.VideoSrv.GetTotal()
 
 	if err != nil {
-		panic(err)
+		entity.Msg = "查询视频列表失败：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
 	}
 
 	entity = response.RespEntity{
@@ -47,7 +51,7 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 // POST /api/v1/video/getVideo
 // data: video_name和video_path
 func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
-	var videoInfoReqBody model.Video
+	var videoInfoReqBody request.VideoReq
 	entity := response.RespEntity{
 		Code:  response.OperateFail,
 		Msg:   response.OperateFail.String(),
@@ -56,12 +60,14 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 	}
 	err := c.ShouldBindQuery(&videoInfoReqBody)
 	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 
-	videoInfo, err := h.VideoSrv.Get(videoInfoReqBody)
+	videoInfo, err := h.VideoSrv.Get(request.VideoModelMapEntity(&videoInfoReqBody))
 	if err != nil {
+		entity.Msg = "获取用户失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -88,14 +94,15 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 	}
 	err := c.ShouldBindQuery(&videoInfoReqBody)
 	if err != nil {
+		entity.Msg = "请求参数错误" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
 
 	videoInfoReqBody.CreateTime = time.Now()
-
 	videoInfo, err := h.VideoSrv.Add(videoInfoReqBody)
 	if err != nil {
+		entity.Msg = "用户添加失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}

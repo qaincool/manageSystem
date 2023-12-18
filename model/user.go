@@ -4,7 +4,7 @@ import "time"
 
 // User 用户
 type User struct {
-	UserID   string    `json:"userId" gorm:"column:user_id;primary_key;not null""`
+	UserID   string    `json:"userId" gorm:"column:user_id;primary_key;not null"`
 	Username string    `json:"username" gorm:"column:username"`
 	Password string    `json:"password" gorm:"column:password"`
 	Mobile   string    `json:"mobile" gorm:"column:mobile"`

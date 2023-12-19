@@ -11,6 +11,7 @@ import (
 var (
 	LoginHandler      handler.LoginHandler
 	UserHandler       handler.UserHandler
+	VideoHandler      handler.VideoHandler
 	PermissionHandler handler.PermissionHandler
 )
 
@@ -18,6 +19,14 @@ func InitHandler() {
 	LoginHandler = handler.LoginHandler{
 		TokenSrv: &service.TokenService{
 			Repo: &repository.TokenRepository{
+				DB: utils.DB,
+			},
+		},
+	}
+
+	VideoHandler = handler.VideoHandler{
+		VideoSrv: &service.VideoService{
+			Repo: &repository.VideoRepository{
 				DB: utils.DB,
 			},
 		},

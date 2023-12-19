@@ -1,18 +1,17 @@
 package handler
 
 import (
-	"github.com/gin-gonic/gin"
-	"manageSystem/model"
 	"manageSystem/model/request"
 	"manageSystem/model/response"
 	"manageSystem/query"
 	"manageSystem/service"
 	"net/http"
-	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 type VideoHandler struct {
-	VideoSrv service.VideoService
+	VideoSrv service.VideoRepoSrv
 }
 
 func (h *VideoHandler) VideoListHandler(c *gin.Context) {
@@ -85,7 +84,7 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 // POST /api/v1/video/addVideo
 // data: 必填字段 video_name和video_path，可选字段 video_intro,video_detail,video_tag,category_id,create_user
 func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
-	var videoInfoReqBody model.Video
+	var videoInfoReqBody request.VideoReq
 	entity := response.RespEntity{
 		Code:  response.OperateFail,
 		Msg:   response.OperateFail.String(),
@@ -99,10 +98,9 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 		return
 	}
 
-	videoInfoReqBody.CreateTime = time.Now()
-	videoInfo, err := h.VideoSrv.Add(videoInfoReqBody)
+	videoInfo, err := h.VideoSrv.Add(*request.VideoModelMapEntity(&videoInfoReqBody))
 	if err != nil {
-		entity.Msg = "用户添加失败：" + err.Error()
+		entity.Msg = "视频添加失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -112,6 +110,74 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 		Msg:   "OK",
 		Total: 1,
 		Data:  videoInfo,
+	}
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+}
+
+// EditVideoHandler 修改视频信息
+// POST /api/v1/video/editVideo
+// data: 必传参数：video_id
+func (h *VideoHandler) EditVideoHandler(c *gin.Context) {
+	var videoInfoReqBody request.VideoReq
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
+		Total: 0,
+		Data:  nil,
+	}
+	err := c.ShouldBindQuery(&videoInfoReqBody)
+	if err != nil {
+		entity.Msg = "请求参数错误" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	videoInfo, err := h.VideoSrv.Edit(*request.VideoModelMapEntity(&videoInfoReqBody))
+	if err != nil {
+		entity.Msg = "视频修改失败：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	entity = response.RespEntity{
+		Code:  http.StatusOK,
+		Msg:   "OK",
+		Total: 1,
+		Data:  videoInfo,
+	}
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+}
+
+// DeleteVideoHandler 修改视频信息
+// POST /api/v1/video/deleteVideo
+// data: 必传参数：video_id
+func (h *VideoHandler) DeleteVideoHandler(c *gin.Context) {
+	var videoInfoReqBody request.VideoReq
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
+		Total: 0,
+		Data:  nil,
+	}
+	err := c.ShouldBindQuery(&videoInfoReqBody)
+	if err != nil {
+		entity.Msg = "请求参数错误" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	_, err = h.VideoSrv.Delete(*request.VideoModelMapEntity(&videoInfoReqBody))
+	if err != nil {
+		entity.Msg = "视频删除失败：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	entity = response.RespEntity{
+		Code:  http.StatusOK,
+		Msg:   "OK",
+		Total: 1,
+		Data:  "",
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }

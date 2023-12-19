@@ -1,7 +1,6 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
 	"manageSystem/model"
 	"manageSystem/query"
@@ -15,13 +14,13 @@ type VideoRepository struct {
 }
 
 type VideoRepoInterface interface {
-	List(req *query.ListQuery) (Videos []*model.Video, err error)
+	List(req *query.ListQuery) (videos []*model.Video, err error)
 	GetTotal() (total int64, err error)
-	Get(Video *model.Video) (*model.Video, error)
-	Exist(Video *model.Video) *model.Video
-	Add(Banner model.Video) (*model.Video, error)
-	Edit(Banner model.Video) (bool, error)
-	Delete(id string) (bool, error)
+	Get(video *model.Video) (*model.Video, error)
+	Exist(video *model.Video) *model.Video
+	Add(video model.Video) (*model.Video, error)
+	Edit(video model.Video) (bool, error)
+	Delete(video model.Video) (bool, error)
 }
 
 func (repo *VideoRepository) List(req *query.ListQuery) (videos []*model.Video, err error) {
@@ -50,31 +49,31 @@ func (repo *VideoRepository) Get(video *model.Video) (*model.Video, error) {
 	return video, nil
 }
 
-// GetVideoByTag 根据tag信息查询视频
-func (repo *VideoRepository) GetVideoByTag(tags []string) ([]*model.Video, error) {
-	var tagsVideos []*model.Video
-	for _, tag := range tags {
-		var video *model.Video
-		if err := repo.DB.Find(&video).Where("video_tag LIKE ?", "%"+tag+"%").Error; err != nil {
-			continue
-		}
-		tagsVideos = append(tagsVideos, video)
-	}
-	return tagsVideos, nil
-}
+// // GetVideoByTag 根据tag信息查询视频
+// func (repo *VideoRepository) GetVideoByTag(tags []string) ([]*model.Video, error) {
+// 	var tagsVideos []*model.Video
+// 	for _, tag := range tags {
+// 		var video *model.Video
+// 		if err := repo.DB.Find(&video).Where("video_tag LIKE ?", "%"+tag+"%").Error; err != nil {
+// 			continue
+// 		}
+// 		tagsVideos = append(tagsVideos, video)
+// 	}
+// 	return tagsVideos, nil
+// }
 
-// GetVideoByCategory 根据视频所属类别查询
-// TODO: 视频类别查询
-func (repo *VideoRepository) GetVideoByCategory(category string) ([]*model.Video, error) {
-	var categoryVideos []*model.Video
-	var total int64
-	repo.DB.Find(&categoryVideos).Where("category_id = ?", category).Count(&total)
-	if total > 0 {
-		return categoryVideos, nil
-	} else {
-		return nil, errors.New("该类别视频不存在")
-	}
-}
+// // GetVideoByCategory 根据视频所属类别查询
+// // TODO: 视频类别查询
+// func (repo *VideoRepository) GetVideoByCategory(category string) ([]*model.Video, error) {
+// 	var categoryVideos []*model.Video
+// 	var total int64
+// 	repo.DB.Find(&categoryVideos).Where("category_id = ?", category).Count(&total)
+// 	if total > 0 {
+// 		return categoryVideos, nil
+// 	} else {
+// 		return nil, errors.New("该类别视频不存在")
+// 	}
+// }
 
 func (repo *VideoRepository) Exist(video *model.Video) *model.Video {
 	var total int64

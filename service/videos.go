@@ -7,18 +7,19 @@ import (
 	"manageSystem/model"
 	"manageSystem/query"
 	"manageSystem/repository"
+	"time"
 
 	uuid "github.com/satori/go.uuid"
 )
 
 type VideoRepoSrv interface {
-	List(req *query.ListQuery) (Videos []*model.Video, err error)
+	List(req *query.ListQuery) (videos []*model.Video, err error)
 	GetTotal() (total int64, err error)
-	Get(Video *model.Video) (*model.Video, error)
-	Exist(Video *model.Video) *model.Video
-	Add(Video model.Video) (*model.Video, error)
-	Edit(Video model.Video) (bool, error)
-	Delete(id string) (bool, error)
+	Get(video *model.Video) (*model.Video, error)
+	Exist(video *model.Video) *model.Video
+	Add(video model.Video) (*model.Video, error)
+	Edit(video model.Video) (bool, error)
+	Delete(video model.Video) (bool, error)
 }
 
 type VideoService struct {
@@ -53,6 +54,7 @@ func (srv *VideoService) Add(video model.Video) (*model.Video, error) {
 		return nil, errors.New("视频名称或地址已经存在")
 	}
 	video.VideoId = uuid.NewV4().String()
+	video.CreateTime = time.Now()
 	return srv.Repo.Add(video)
 }
 
@@ -72,17 +74,13 @@ func (srv *VideoService) Edit(video model.Video) (bool, error) {
 	return srv.Repo.Edit(*exist)
 }
 
-func (srv *VideoService) Delete(id string) (bool, error) {
-	if id == "" {
+func (srv *VideoService) Delete(video model.Video) (bool, error) {
+	if video.VideoId == "" {
 		return false, errors.New("参数错误")
 	}
-	v := model.Video{
-		VideoId: id,
-	}
-
-	video := srv.Exist(&v)
-	if video == nil {
+	v := srv.Exist(&video)
+	if v == nil {
 		return false, errors.New("参数错误")
 	}
-	return srv.Repo.Delete(video.VideoId)
+	return srv.Repo.Delete(video)
 }

@@ -11,6 +11,7 @@ func init() {
 	router.InitHandler()
 	router.InitMiddleware()
 }
+
 func main() {
 	router.Run()
 }

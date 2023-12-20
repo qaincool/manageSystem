@@ -2,7 +2,7 @@ package model
 
 import "time"
 
-// 视频
+// Video 视频类
 type Video struct {
 	VideoId   string `json:"video_id" gorm:"column:video_id;primary_key;not null"`
 	VideoName string `json:"video_name" gorm:"column:video_name"`

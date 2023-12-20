@@ -10,6 +10,9 @@ type User struct {
 	Mobile   string    `json:"mobile" gorm:"column:mobile"`
 	Address  string    `json:"address" gorm:"column:address"`
 	RoleName string    `json:"role_name" gorm:"column:role_name"`
+	Email    string    `json:"email" gorm:"column:email"`
+	QQ       string    `json:"qq"  gorm:"column:qq"`
+	Age      uint      `json:"age" gorm:"column:age"`
+	Sex      string    `json:"sex" gorm:"column:sex"`
 	CreateAt time.Time `json:"createAt" gorm:"column:create_at;default:null"`
-	UpdateAt time.Time `json:"updateAt" gorm:"column:update_at;default:null"`
 }

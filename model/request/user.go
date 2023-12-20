@@ -10,6 +10,10 @@ type UserReq struct {
 	Password string `json:"password"`
 	Address  string `json:"address"`
 	RoleName string `json:"role_name"`
+	Email    string `json:"email"`
+	QQ       string `json:"qq"`
+	Age      uint   `json:"age"`
+	Sex      string `json:"sex"`
 }
 
 func UserModelMapEntity(user *UserReq) *model.User {
@@ -20,6 +24,10 @@ func UserModelMapEntity(user *UserReq) *model.User {
 		Password: user.Password,
 		Address:  user.Address,
 		RoleName: user.RoleName,
+		Email:    user.Email,
+		QQ:       user.QQ,
+		Age:      user.Age,
+		Sex:      user.Sex,
 	}
 	return userEntity
 }

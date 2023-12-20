@@ -9,6 +9,10 @@ type UserResp struct {
 	Mobile   string `json:"mobile"`
 	Address  string `json:"address"`
 	RoleName string `json:"role_name"`
+	Email    string `json:"email"`
+	QQ       string `json:"qq"`
+	Age      uint   `json:"age"`
+	Sex      string `json:"sex"`
 }
 
 func UserModelMapEntity(user *model.User) *UserResp {
@@ -18,6 +22,10 @@ func UserModelMapEntity(user *model.User) *UserResp {
 		Mobile:   user.Mobile,
 		Address:  user.Address,
 		RoleName: user.RoleName,
+		Email:    user.Email,
+		QQ:       user.QQ,
+		Age:      user.Age,
+		Sex:      user.Sex,
 	}
 	return userEntity
 }

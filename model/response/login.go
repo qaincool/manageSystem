@@ -10,6 +10,7 @@ type LoginResp struct {
 	Token  string    `json:"token"`
 	UserID string    `json:"userId"`
 	Expiry time.Time `json:"expiry"`
+	User   UserResp
 }
 
 func LoginModelMapEntity(token *model.Token) *LoginResp {

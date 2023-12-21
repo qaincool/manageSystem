@@ -3,13 +3,13 @@ package service
 import (
 	"errors"
 	"fmt"
+	uuid "github.com/satori/go.uuid"
 	"manageSystem/config"
 	"manageSystem/model"
 	"manageSystem/query"
 	"manageSystem/repository"
 	"manageSystem/utils"
-
-	uuid "github.com/satori/go.uuid"
+	"time"
 )
 
 type UserSrv interface {
@@ -62,6 +62,7 @@ func (srv *UserService) Add(user *model.User) (*model.User, error) {
 	} else {
 		user.Password = utils.Md5(user.Password)
 	}
+	user.CreateAt = time.Now()
 	return srv.Repo.Add(*user)
 }
 

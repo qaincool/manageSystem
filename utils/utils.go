@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"math/rand"
+	"strings"
 	"time"
 )
 
@@ -79,4 +80,12 @@ func CreateToken(userId string, expiresAt time.Time) string {
 	tokenStr := fmt.Sprintf("%s:%d", token, expiresAtInSecs)
 
 	return tokenStr
+}
+
+func ArrayToString(values []string) string {
+	return strings.Join(values, ",")
+}
+
+func StringToArray(value string) []string {
+	return strings.Split(value, ",")
 }

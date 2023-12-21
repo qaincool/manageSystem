@@ -22,6 +22,11 @@ func InitHandler() {
 				DB: utils.DB,
 			},
 		},
+		UserSrv: &service.UserService{
+			Repo: &repository.UserRepository{
+				DB: utils.DB,
+			},
+		},
 	}
 
 	VideoHandler = handler.VideoHandler{

@@ -17,7 +17,7 @@ type VideoRepoSrv interface {
 	GetTotal() (total int64, err error)
 	Get(video *model.Video) (*model.Video, error)
 	Exist(video *model.Video) *model.Video
-	Add(video model.Video) (*model.Video, error)
+	Add(video *model.Video) (*model.Video, error)
 	Edit(video model.Video) (bool, error)
 	Delete(video model.Video) (bool, error)
 }
@@ -45,11 +45,11 @@ func (srv *VideoService) Exist(video *model.Video) *model.Video {
 	return srv.Repo.Exist(video)
 }
 
-func (srv *VideoService) Add(video model.Video) (*model.Video, error) {
+func (srv *VideoService) Add(video *model.Video) (*model.Video, error) {
 	if video.VideoPath == "" || video.VideoName == "" {
 		return nil, errors.New("请输入视频名称或存放地址")
 	}
-	nameResult := srv.Repo.Exist(&video)
+	nameResult := srv.Repo.Exist(video)
 	if nameResult != nil {
 		return nil, errors.New("视频名称或地址已经存在")
 	}

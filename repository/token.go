@@ -18,6 +18,7 @@ type TokenRepoInterface interface {
 	AuthLoginUser(loginUser request.LoginReq) (*model.User, error)
 	AuthToken(loginToken string) ([]*model.Token, error)
 	CreateToken(loginUser request.LoginReq) (*model.Token, error)
+	GetTokenUser(loginUser request.LoginReq) (*model.User, error)
 }
 
 // AuthLoginUser 验证登录的账号密码是否正确
@@ -28,7 +29,7 @@ func (repo *TokenRepository) AuthLoginUser(loginUser request.LoginReq) (*model.U
 		Password: loginUser.Password,
 	}
 	repo.DB.First(&user).Count(&total)
-	if total > 0 && loginUser.Password == user.Password {
+	if total > 0 && utils.Md5(loginUser.Password) == user.Password {
 		return user, nil
 	} else {
 		return nil, errors.New("用户不存在或密码错误")
@@ -64,4 +65,11 @@ func (repo *TokenRepository) CreateToken(loginUser request.LoginReq) (*model.Tok
 		return nil, fmt.Errorf("token创建失败")
 	}
 	return token, err
+}
+
+func (repo *TokenRepository) GetTokenUser(loginUser request.LoginReq) (*model.User, error) {
+	var user *model.User
+	repo.DB.Find(&user).Where("mobile = ?", loginUser.Mobile)
+	return user, nil
+
 }

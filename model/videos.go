@@ -13,7 +13,7 @@ type Video struct {
 	// 详细描述
 	VideoDetail string `json:"video_detail" gorm:"column:video_detail"`
 	// 标签信息
-	VideoTag []string `json:"video_tag" column:"video_tag"`
+	VideoTag string `json:"video_tag" column:"video_tag"`
 	// 所属品类id号
 	CategoryId string `json:"category_id" gorm:"column:category_id"`
 	// 上传用户

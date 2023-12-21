@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"fmt"
 	"manageSystem/model/request"
 	"manageSystem/model/response"
 	"manageSystem/query"
@@ -84,21 +85,21 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 // POST /api/v1/video/addVideo
 // data: 必填字段 video_name和video_path，可选字段 video_intro,video_detail,video_tag,category_id,create_user
 func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
-	var videoInfoReqBody request.VideoReq
+	var videoInfoReqBody = request.VideoReq{}
 	entity := response.RespEntity{
 		Code:  response.OperateFail,
 		Msg:   response.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindQuery(&videoInfoReqBody)
+	err := c.ShouldBind(&videoInfoReqBody)
 	if err != nil {
 		entity.Msg = "请求参数错误" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-
-	videoInfo, err := h.VideoSrv.Add(*request.VideoModelMapEntity(&videoInfoReqBody))
+	fmt.Println(&videoInfoReqBody.Name)
+	videoInfo, err := h.VideoSrv.Add(request.VideoModelMapEntity(&videoInfoReqBody))
 	if err != nil {
 		entity.Msg = "视频添加失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -109,7 +110,7 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 		Code:  http.StatusOK,
 		Msg:   "OK",
 		Total: 1,
-		Data:  videoInfo,
+		Data:  response.VideoModelMapEntity(videoInfo),
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }

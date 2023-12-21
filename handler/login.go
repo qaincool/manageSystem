@@ -10,6 +10,7 @@ import (
 
 type LoginHandler struct {
 	TokenSrv service.TokenSrv
+	UserSrv  service.UserSrv
 }
 
 func (h *LoginHandler) LoginHandler(c *gin.Context) {
@@ -27,13 +28,16 @@ func (h *LoginHandler) LoginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-
-	userToken, err := h.TokenSrv.CreateToken(login)
+	token, err := h.TokenSrv.CreateToken(login)
 	if err != nil {
 		entity.Msg = "token创建失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
+
+	user, err := h.TokenSrv.GetTokenUser(login)
+	userToken := response.LoginModelMapEntity(token)
+	userToken.User = *response.UserModelMapEntity(user)
 
 	entity.Code = response.OperateOk
 	entity.Msg = "token创建成功"

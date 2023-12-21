@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"errors"
 	"fmt"
 	"manageSystem/model"
 	"manageSystem/query"
@@ -46,10 +47,13 @@ func (repo *UserRepository) GetTotal(req *query.ListQuery) (total int64, err err
 }
 
 func (repo *UserRepository) Get(user model.User) (*model.User, error) {
-	if err := repo.DB.Where(&user).Find(&user).Error; err != nil {
-		return nil, err
+	var total int64
+	repo.DB.Where(&user).Find(&user).Count(&total)
+	if total > 0 {
+		return &user, nil
+	} else {
+		return nil, errors.New("用户不存在")
 	}
-	return &user, nil
 }
 
 func (repo *UserRepository) Exist(user model.User) *model.User {

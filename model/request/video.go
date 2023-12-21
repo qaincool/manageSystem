@@ -1,19 +1,22 @@
 package request
 
-import "manageSystem/model"
+import (
+	"manageSystem/model"
+	"manageSystem/utils"
+)
 
 // VideoReq 请求体
 type VideoReq struct {
-	VideoId   string `json:"video_id"`
-	VideoName string `json:"video_name"`
+	Id   string `json:"id"`
+	Name string `json:"name"`
 	// 简介
-	VideoIntro string `json:"video_intro"`
+	Intro string `json:"intro"`
 	// 视频存放路径
-	VideoPath string `json:"video_path"`
+	Path string `json:"path"`
 	// 详细描述
-	VideoDetail string `json:"video_detail"`
+	Detail string `json:"detail"`
 	// 标签信息
-	VideoTag []string `json:"video_tag"`
+	Tag []string `json:"tag"`
 	// 所属品类id号
 	CategoryId string `json:"category_id"`
 	// 上传用户
@@ -22,12 +25,12 @@ type VideoReq struct {
 
 func VideoModelMapEntity(video *VideoReq) *model.Video {
 	var videoEntity = &model.Video{
-		VideoId:     video.VideoId,
-		VideoName:   video.VideoName,
-		VideoIntro:  video.VideoIntro,
-		VideoPath:   video.VideoPath,
-		VideoDetail: video.VideoDetail,
-		VideoTag:    video.VideoTag,
+		VideoId:     video.Id,
+		VideoName:   video.Name,
+		VideoIntro:  video.Intro,
+		VideoPath:   video.Path,
+		VideoDetail: video.Detail,
+		VideoTag:    utils.ArrayToString(video.Tag),
 		CategoryId:  video.CategoryId,
 		CreateUser:  video.CreateUser,
 	}

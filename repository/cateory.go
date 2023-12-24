@@ -15,7 +15,6 @@ type CategoryRepoInterface interface {
 	Get(Category model.Category) (*model.Category, error)
 	ExistByName(Category model.Category) *model.Category
 	Add(Category model.Category) (*model.Category, error)
-	EditDescByName(Category model.Category) (bool, error)
 }
 
 func (repo *CategoryRepository) Get(category model.Category) (*model.Category, error) {
@@ -46,13 +45,4 @@ func (repo *CategoryRepository) Add(category model.Category) (*model.Category, e
 		return nil, fmt.Errorf("分类添加失败")
 	}
 	return &category, nil
-}
-
-func (repo *UserRepository) EditDescByName(category model.Category) (bool, error) {
-	err := repo.DB.Model(&category).Where("category_name=?", category.CategoryName).Updates(map[string]interface{}{"category_desc": category.CategoryDesc}).Error
-	//err := repo.DB.Save(&user).Error
-	if err != nil {
-		return false, err
-	}
-	return true, nil
 }

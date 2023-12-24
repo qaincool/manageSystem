@@ -14,34 +14,36 @@ func Run() {
 
 	apiRouter := router.Group("/api/v1")
 
-	userRouter := apiRouter.Group("/user")
+	userRouter := apiRouter.Group("user")
 	{
 		userRouter.Use(middleware.AuthToken())
-		userRouter.GET("/getUserList", UserHandler.UserListHandler)
-		userRouter.POST("/getUser", UserHandler.UserInfoHandler)
-		userRouter.POST("/addUser", UserHandler.AddUserHandler)
-		userRouter.POST("/editUser", UserHandler.EditUserHandler)
-		userRouter.POST("/deleteUser", UserHandler.DeleteUserHandler)
+		userRouter.GET("getUserList", UserHandler.UserListHandler)
+		userRouter.POST("getUser", UserHandler.UserInfoHandler)
+		userRouter.POST("addUser", UserHandler.AddUserHandler)
+		userRouter.POST("editUser", UserHandler.EditUserHandler)
+		userRouter.POST("deleteUser", UserHandler.DeleteUserHandler)
 	}
 
-	videoRouter := apiRouter.Group("/video")
+	videoRouter := apiRouter.Group("video")
 	{
 		videoRouter.Use(middleware.AuthToken())
-		videoRouter.GET("/getVideoList", VideoHandler.VideoListHandler)
-		videoRouter.POST("/getVideo", VideoHandler.VideoInfoHandler)
-		videoRouter.POST("/addVideo", VideoHandler.AddVideoHandler)
-		videoRouter.POST("/editVideo", VideoHandler.EditVideoHandler)
-		videoRouter.POST("/deleteVideo", VideoHandler.DeleteVideoHandler)
+		videoRouter.GET("getVideoList", VideoHandler.VideoListHandler)
+		videoRouter.POST("getVideo", VideoHandler.VideoInfoHandler)
+		videoRouter.POST("getVideoByTags", VideoHandler.VideoInfoByTagsHandler)
+		videoRouter.POST("getVideoByCategory", VideoHandler.VideoInfoByCategoryHandler)
+		videoRouter.POST("addVideo", VideoHandler.AddVideoHandler)
+		videoRouter.POST("editVideo", VideoHandler.EditVideoHandler)
+		videoRouter.POST("deleteVideo", VideoHandler.DeleteVideoHandler)
 	}
 
 	// 登录
-	apiRouter.POST("/login", LoginHandler.LoginHandler)
+	apiRouter.POST("login", LoginHandler.LoginHandler)
 	// 权限
 	apiRouter.Use(middleware.AuthToken())
-	apiRouter.GET("/permission", PermissionHandler.PermissionHandler)
+	apiRouter.GET("permission", PermissionHandler.PermissionHandler)
 
 	// 上传视频
-	apiRouter.POST("/upload", handler.UploadFileHandler)
+	apiRouter.POST("upload", handler.UploadFileHandler)
 
 	router.Run(":" + viper.GetString("port"))
 }

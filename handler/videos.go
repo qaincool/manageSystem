@@ -1,10 +1,8 @@
 package handler
 
 import (
-	"fmt"
 	"manageSystem/model/request"
 	"manageSystem/model/response"
-	"manageSystem/query"
 	"manageSystem/service"
 	"net/http"
 
@@ -16,20 +14,13 @@ type VideoHandler struct {
 }
 
 func (h *VideoHandler) VideoListHandler(c *gin.Context) {
-	var q query.ListQuery
 	entity := response.RespEntity{
 		Code:  response.OperateFail,
 		Msg:   response.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindJSON(&q)
-	if err != nil {
-		entity.Msg = "请求参数错误：" + err.Error()
-		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
-		return
-	}
-	videoList, err := h.VideoSrv.List(&q)
+	videoList, err := h.VideoSrv.List()
 	total, err := h.VideoSrv.GetTotal()
 
 	if err != nil {
@@ -38,11 +29,16 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 		return
 	}
 
+	var videoEntityList []*response.VideoResp
+	for _, videoInfo := range videoList {
+		videoEntityList = append(videoEntityList, response.VideoModelMapEntity(videoInfo))
+	}
+
 	entity = response.RespEntity{
 		Code:  http.StatusOK,
 		Msg:   "获取视频列表成功",
 		Total: total,
-		Data:  videoList,
+		Data:  videoEntityList,
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }
@@ -67,7 +63,7 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 
 	videoInfo, err := h.VideoSrv.Get(request.VideoModelMapEntity(&videoInfoReqBody))
 	if err != nil {
-		entity.Msg = "获取用户失败：" + err.Error()
+		entity.Msg = "获取视频失败：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
@@ -76,7 +72,79 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 		Code:  http.StatusOK,
 		Msg:   "获取视频成功",
 		Total: 1,
-		Data:  videoInfo,
+		Data:  response.VideoModelMapEntity(videoInfo),
+	}
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+}
+
+func (h *VideoHandler) VideoInfoByTagsHandler(c *gin.Context) {
+	var videoInfoReqBody request.VideoReq
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
+		Total: 0,
+		Data:  nil,
+	}
+	err := c.ShouldBindJSON(&videoInfoReqBody)
+	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	videoList, err := h.VideoSrv.GetVideoByTag(videoInfoReqBody.Tag)
+	if err != nil {
+		entity.Msg = "获取视频失败：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	var videoEntityList []*response.VideoResp
+	for _, videoInfo := range videoList {
+		videoEntityList = append(videoEntityList, response.VideoModelMapEntity(videoInfo))
+	}
+
+	entity = response.RespEntity{
+		Code:  http.StatusOK,
+		Msg:   "获取视频成功",
+		Total: int64(len(videoEntityList)),
+		Data:  videoEntityList,
+	}
+	c.JSON(http.StatusOK, gin.H{"entity": entity})
+}
+
+func (h *VideoHandler) VideoInfoByCategoryHandler(c *gin.Context) {
+	var videoInfoReqBody request.VideoReq
+	entity := response.RespEntity{
+		Code:  response.OperateFail,
+		Msg:   response.OperateFail.String(),
+		Total: 0,
+		Data:  nil,
+	}
+	err := c.ShouldBindJSON(&videoInfoReqBody)
+	if err != nil {
+		entity.Msg = "请求参数错误：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	videoList, err := h.VideoSrv.GetVideoByCategory(videoInfoReqBody.Category)
+	if err != nil {
+		entity.Msg = "获取视频失败：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
+	var videoEntityList []*response.VideoResp
+	for _, videoInfo := range videoList {
+		videoEntityList = append(videoEntityList, response.VideoModelMapEntity(videoInfo))
+	}
+
+	entity = response.RespEntity{
+		Code:  http.StatusOK,
+		Msg:   "获取视频成功",
+		Total: int64(len(videoEntityList)),
+		Data:  videoEntityList,
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }
@@ -98,7 +166,6 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
-	fmt.Println(&videoInfoReqBody.Name)
 	videoInfo, err := h.VideoSrv.Add(request.VideoModelMapEntity(&videoInfoReqBody))
 	if err != nil {
 		entity.Msg = "视频添加失败：" + err.Error()

@@ -21,7 +21,6 @@ func InitViper() {
 }
 
 func InitDB() {
-	fmt.Println("数据库 init")
 	var err error
 	conf := &model.Database{
 		Host:     viper.GetString("database.host"),

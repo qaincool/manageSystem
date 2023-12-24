@@ -8,7 +8,7 @@ import (
 
 // VideoResp 请求体
 type VideoResp struct {
-	VideoId   string `json:"id"`
+	VideoId   int    `json:"id"`
 	VideoName string `json:"name"`
 	// 简介
 	VideoIntro string `json:"intro"`
@@ -19,7 +19,7 @@ type VideoResp struct {
 	// 标签信息
 	VideoTag []string `json:"tag"`
 	// 所属品类id号
-	CategoryId string `json:"category_id"`
+	Category []string `json:"categories"`
 	// 上传用户
 	CreateUser string `json:"create_user"`
 	// 时间上传时间
@@ -34,9 +34,17 @@ func VideoModelMapEntity(video *model.Video) *VideoResp {
 		VideoPath:   video.VideoPath,
 		VideoDetail: video.VideoDetail,
 		VideoTag:    utils.StringToArray(video.VideoTag),
-		CategoryId:  video.CategoryId,
+		Category:    CategoryModelMapEntity(video.Category),
 		CreateUser:  video.CreateUser,
 		CreateTime:  video.CreateTime,
 	}
 	return videoEntity
+}
+
+func CategoryModelMapEntity(CategoryModels []*model.Category) []string {
+	var categories []string
+	for _, categoryModel := range CategoryModels {
+		categories = append(categories, categoryModel.CategoryName)
+	}
+	return categories
 }

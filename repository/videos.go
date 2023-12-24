@@ -1,13 +1,9 @@
 package repository
 
 import (
-	"errors"
 	"fmt"
-	"manageSystem/model"
-	"manageSystem/query"
-	"manageSystem/utils"
-
 	"gorm.io/gorm"
+	"manageSystem/model"
 )
 
 type VideoRepository struct {
@@ -15,23 +11,23 @@ type VideoRepository struct {
 }
 
 type VideoRepoInterface interface {
-	List(req *query.ListQuery) (videos []*model.Video, err error)
+	List() (videos []*model.Video, err error)
 	GetTotal() (total int64, err error)
 	Get(video *model.Video) (*model.Video, error)
 	Exist(video *model.Video) *model.Video
-	ExistByID(id string) *model.Video
+	ExistByID(id int) *model.Video
 	Add(video *model.Video) (*model.Video, error)
 	Edit(video *model.Video) (*model.Video, error)
 	Delete(video model.Video) (bool, error)
 	GetVideoByTag(tags []string) ([]*model.Video, error)
-	GetVideoByCategory(category string) ([]*model.Video, error)
+	GetVideoByCategory(categories []string) ([]*model.Video, error)
 }
 
-func (repo *VideoRepository) List(req *query.ListQuery) (videos []*model.Video, err error) {
+func (repo *VideoRepository) List() (videos []*model.Video, err error) {
 	db := repo.DB
-	limit, offset := utils.Page(req.PageSize, req.Page) // 分页
+	//limit, offset := utils.Page(req.PageSize, req.Page) // 分页
 
-	if err := db.Order("video_id desc").Limit(limit).Offset(offset).Find(&videos).Error; err != nil {
+	if err := db.Preload("Category").Find(&videos).Error; err != nil {
 		return nil, err
 	}
 	return videos, nil
@@ -40,14 +36,14 @@ func (repo *VideoRepository) List(req *query.ListQuery) (videos []*model.Video, 
 func (repo *VideoRepository) GetTotal() (total int64, err error) {
 	var videos []model.Video
 	db := repo.DB
-	if err := db.Find(&videos).Count(&total).Error; err != nil {
+	if err := db.Preload("Category").Find(&videos).Count(&total).Error; err != nil {
 		return total, err
 	}
 	return total, nil
 }
 
 func (repo *VideoRepository) Get(video *model.Video) (*model.Video, error) {
-	if err := repo.DB.Where(&video).Find(&video).Error; err != nil {
+	if err := repo.DB.Preload("Category").Find(&video).Error; err != nil {
 		return nil, err
 	}
 	return video, nil
@@ -58,7 +54,7 @@ func (repo *VideoRepository) GetVideoByTag(tags []string) ([]*model.Video, error
 	var tagsVideos []*model.Video
 	for _, tag := range tags {
 		var video *model.Video
-		if err := repo.DB.Find(&video).Where("video_tag LIKE ?", "%"+tag+"%").Error; err != nil {
+		if err := repo.DB.Preload("Category").Find(&video).Where("video_tag LIKE ?", "%"+tag+"%").Error; err != nil {
 			continue
 		}
 		tagsVideos = append(tagsVideos, video)
@@ -68,15 +64,17 @@ func (repo *VideoRepository) GetVideoByTag(tags []string) ([]*model.Video, error
 
 // GetVideoByCategory 根据视频所属类别查询
 // TODO: 视频类别查询
-func (repo *VideoRepository) GetVideoByCategory(category string) ([]*model.Video, error) {
+func (repo *VideoRepository) GetVideoByCategory(categories []string) ([]*model.Video, error) {
 	var categoryVideos []*model.Video
-	var total int64
-	repo.DB.Find(&categoryVideos).Where("category_id = ?", category).Count(&total)
-	if total > 0 {
-		return categoryVideos, nil
-	} else {
-		return nil, errors.New("该类别视频不存在")
+	for _, category := range categories {
+		var video *model.Video
+		if err := repo.DB.Preload("Category", "category_name = ?", category).Find(&video).Error; err != nil {
+			continue
+		}
+		categoryVideos = append(categoryVideos, video)
 	}
+	return categoryVideos, nil
+
 }
 
 func (repo *VideoRepository) Exist(video *model.Video) *model.Video {
@@ -88,7 +86,7 @@ func (repo *VideoRepository) Exist(video *model.Video) *model.Video {
 	return nil
 }
 
-func (repo *VideoRepository) ExistByID(id string) *model.Video {
+func (repo *VideoRepository) ExistByID(id int) *model.Video {
 	var video model.Video
 	var total int64
 	repo.DB.First(&video).Where("video_id = ?", id).Count(&total)
@@ -116,7 +114,6 @@ func (repo *VideoRepository) Edit(video *model.Video) (*model.Video, error) {
 		"video_path":   video.VideoPath,
 		"video_detail": video.VideoDetail,
 		"video_tag":    video.VideoTag,
-		"category_id":  video.CategoryId,
 	}).Error
 	//err := repo.DB.Save(&user).Error
 	if err != nil {

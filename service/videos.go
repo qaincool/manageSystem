@@ -18,7 +18,7 @@ type VideoRepoSrv interface {
 	Get(video *model.Video) (*model.Video, error)
 	Exist(video *model.Video) *model.Video
 	Add(video *model.Video) (*model.Video, error)
-	Edit(video model.Video) (bool, error)
+	Edit(video model.Video) (*model.Video, error)
 	Delete(video model.Video) (bool, error)
 }
 
@@ -58,20 +58,20 @@ func (srv *VideoService) Add(video *model.Video) (*model.Video, error) {
 	return srv.Repo.Add(video)
 }
 
-func (srv *VideoService) Edit(video model.Video) (bool, error) {
+func (srv *VideoService) Edit(video model.Video) (*model.Video, error) {
 	if video.VideoId == "" {
-		return false, fmt.Errorf("参数错误")
+		return nil, fmt.Errorf("参数错误")
 	}
-	exist := srv.Repo.Exist(&video)
+	exist := srv.Repo.ExistByID(video.VideoId)
 	if exist == nil {
-		return false, errors.New("参数错误")
+		return nil, errors.New("参数错误")
 	}
 	exist.VideoName = video.VideoName
 	exist.VideoDetail = video.VideoDetail
 	exist.VideoIntro = video.VideoIntro
 	exist.VideoPath = video.VideoPath
 	exist.VideoTag = video.VideoTag
-	return srv.Repo.Edit(*exist)
+	return srv.Repo.Edit(exist)
 }
 
 func (srv *VideoService) Delete(video model.Video) (bool, error) {

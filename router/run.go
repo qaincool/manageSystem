@@ -1,6 +1,7 @@
 package router
 
 import (
+	"manageSystem/handler"
 	"manageSystem/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -38,6 +39,9 @@ func Run() {
 	// 权限
 	apiRouter.Use(middleware.AuthToken())
 	apiRouter.GET("/permission", PermissionHandler.PermissionHandler)
+
+	// 上传视频
+	apiRouter.POST("/upload", handler.UploadFileHandler)
 
 	router.Run(":" + viper.GetString("port"))
 }

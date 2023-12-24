@@ -59,7 +59,7 @@ func (h *UserHandler) UserListHandler(c *gin.Context) {
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindQuery(&q)
+	err := c.ShouldBindJSON(&q)
 	if err != nil {
 		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})

@@ -23,7 +23,7 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindQuery(&q)
+	err := c.ShouldBindJSON(&q)
 	if err != nil {
 		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -40,7 +40,7 @@ func (h *VideoHandler) VideoListHandler(c *gin.Context) {
 
 	entity = response.RespEntity{
 		Code:  http.StatusOK,
-		Msg:   "OK",
+		Msg:   "获取视频列表成功",
 		Total: total,
 		Data:  videoList,
 	}
@@ -58,7 +58,7 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindQuery(&videoInfoReqBody)
+	err := c.ShouldBindJSON(&videoInfoReqBody)
 	if err != nil {
 		entity.Msg = "请求参数错误：" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -74,7 +74,7 @@ func (h *VideoHandler) VideoInfoHandler(c *gin.Context) {
 
 	entity = response.RespEntity{
 		Code:  http.StatusOK,
-		Msg:   "OK",
+		Msg:   "获取视频成功",
 		Total: 1,
 		Data:  videoInfo,
 	}
@@ -92,7 +92,7 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBind(&videoInfoReqBody)
+	err := c.ShouldBindJSON(&videoInfoReqBody)
 	if err != nil {
 		entity.Msg = "请求参数错误" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -108,7 +108,7 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 
 	entity = response.RespEntity{
 		Code:  http.StatusOK,
-		Msg:   "OK",
+		Msg:   "视频添加成功",
 		Total: 1,
 		Data:  response.VideoModelMapEntity(videoInfo),
 	}
@@ -117,16 +117,16 @@ func (h *VideoHandler) AddVideoHandler(c *gin.Context) {
 
 // EditVideoHandler 修改视频信息
 // POST /api/v1/video/editVideo
-// data: 必传参数：video_id
+// data: 必传参数：id
 func (h *VideoHandler) EditVideoHandler(c *gin.Context) {
-	var videoInfoReqBody request.VideoReq
+	var videoInfoReqBody = request.VideoReq{}
 	entity := response.RespEntity{
 		Code:  response.OperateFail,
 		Msg:   response.OperateFail.String(),
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindQuery(&videoInfoReqBody)
+	err := c.ShouldBindJSON(&videoInfoReqBody)
 	if err != nil {
 		entity.Msg = "请求参数错误" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -142,16 +142,16 @@ func (h *VideoHandler) EditVideoHandler(c *gin.Context) {
 
 	entity = response.RespEntity{
 		Code:  http.StatusOK,
-		Msg:   "OK",
+		Msg:   "视频修改成功",
 		Total: 1,
-		Data:  videoInfo,
+		Data:  response.VideoModelMapEntity(videoInfo),
 	}
 	c.JSON(http.StatusOK, gin.H{"entity": entity})
 }
 
 // DeleteVideoHandler 修改视频信息
 // POST /api/v1/video/deleteVideo
-// data: 必传参数：video_id
+// data: 必传参数：id
 func (h *VideoHandler) DeleteVideoHandler(c *gin.Context) {
 	var videoInfoReqBody request.VideoReq
 	entity := response.RespEntity{
@@ -160,7 +160,7 @@ func (h *VideoHandler) DeleteVideoHandler(c *gin.Context) {
 		Total: 0,
 		Data:  nil,
 	}
-	err := c.ShouldBindQuery(&videoInfoReqBody)
+	err := c.ShouldBindJSON(&videoInfoReqBody)
 	if err != nil {
 		entity.Msg = "请求参数错误" + err.Error()
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
@@ -176,7 +176,7 @@ func (h *VideoHandler) DeleteVideoHandler(c *gin.Context) {
 
 	entity = response.RespEntity{
 		Code:  http.StatusOK,
-		Msg:   "OK",
+		Msg:   "视频删除成功",
 		Total: 1,
 		Data:  "",
 	}

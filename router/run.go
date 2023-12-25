@@ -10,7 +10,7 @@ import (
 
 func Run() {
 	router := gin.New()
-	router.Use(gin.Logger(), gin.Recovery())
+	router.Use(gin.Logger(), gin.Recovery(), middleware.Cors)
 
 	apiRouter := router.Group("/api/v1")
 

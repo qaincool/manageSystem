@@ -28,6 +28,14 @@ func (h *LoginHandler) LoginHandler(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
 		return
 	}
+
+	err = h.TokenSrv.AuthLoginUser(login)
+	if err != nil {
+		entity.Msg = "token创建失败：" + err.Error()
+		c.JSON(http.StatusInternalServerError, gin.H{"entity": entity})
+		return
+	}
+
 	token, err := h.TokenSrv.CreateToken(login)
 	if err != nil {
 		entity.Msg = "token创建失败：" + err.Error()

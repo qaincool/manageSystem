@@ -9,6 +9,7 @@ import (
 )
 
 type TokenSrv interface {
+	AuthLoginUser(loginUser request.LoginReq) error
 	AuthToken(loginToken string) error
 	CreateToken(loginUser request.LoginReq) (*model.Token, error)
 	GetTokenUser(loginUser request.LoginReq) (*model.User, error)
@@ -16,6 +17,10 @@ type TokenSrv interface {
 
 type TokenService struct {
 	Repo repository.TokenRepoInterface
+}
+
+func (srv *TokenService) AuthLoginUser(loginUser request.LoginReq) error {
+	return srv.Repo.AuthLoginUser(loginUser)
 }
 
 func (srv *TokenService) AuthToken(loginToken string) error {
